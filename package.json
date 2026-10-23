@@ -1,0 +1,19 @@
+{
+  "name": "attendance-management-system",
+  "version": "1.0.0",
+  "description": "Student Attendance Management System built with Java and JDBC",
+  "scripts": {
+    "dev": "./run.sh web",
+    "start": "./run.sh web",
+    "cli": "./run.sh cli",
+    "build": "echo 'Ready for deployment'",
+    "build:java": "./compile.sh"
+  },
+  "keywords": [
+    "java",
+    "jdbc",
+    "attendance-management"
+  ],
+  "author": "",
+  "license": "MIT"
+}

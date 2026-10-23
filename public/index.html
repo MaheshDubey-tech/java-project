@@ -1,0 +1,1887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Attendance Management System | Java & JDBC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #0B0F19;
+      --bg-glass-base: rgba(18, 24, 38, 0.55);
+      --bg-glass-card: rgba(22, 30, 48, 0.6);
+      --bg-glass-hover: rgba(30, 41, 66, 0.75);
+      --bg-glass-input: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.14);
+      --glass-border-light: rgba(255, 255, 255, 0.22);
+      --glass-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      --glass-shadow-lg: 0 20px 50px 0 rgba(0, 0, 0, 0.5);
+      
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+      
+      --primary: #6366F1;
+      --primary-hover: #4F46E5;
+      --primary-glow: rgba(99, 102, 241, 0.35);
+      
+      --success: #10B981;
+      --success-glow: rgba(16, 185, 129, 0.3);
+      --danger: #EF4444;
+      --danger-glow: rgba(239, 68, 68, 0.3);
+      --warning: #F59E0B;
+      --warning-glow: rgba(245, 158, 11, 0.3);
+      
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-full: 9999px;
+      
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(20, 184, 166, 0.1) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.06) 0%, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* Floating Ambient Glass Orbs Background */
+    .glass-mesh {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .glass-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.65;
+      animation: floatOrb 18s ease-in-out infinite alternate;
+    }
+
+    .glass-orb-1 {
+      width: 480px;
+      height: 480px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.45) 0%, rgba(99, 102, 241, 0) 70%);
+      top: -100px;
+      left: -80px;
+      animation-duration: 22s;
+    }
+
+    .glass-orb-2 {
+      width: 420px;
+      height: 420px;
+      background: radial-gradient(circle, rgba(20, 184, 166, 0.38) 0%, rgba(20, 184, 166, 0) 70%);
+      top: 15%;
+      right: -100px;
+      animation-duration: 26s;
+      animation-delay: -5s;
+    }
+
+    .glass-orb-3 {
+      width: 520px;
+      height: 520px;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.35) 0%, rgba(168, 85, 247, 0) 70%);
+      bottom: 5%;
+      left: 15%;
+      animation-duration: 28s;
+      animation-delay: -10s;
+    }
+
+    .glass-orb-4 {
+      width: 360px;
+      height: 360px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.32) 0%, rgba(59, 130, 246, 0) 70%);
+      bottom: -80px;
+      right: 15%;
+      animation-duration: 20s;
+      animation-delay: -3s;
+    }
+
+    @keyframes floatOrb {
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+      50% {
+        transform: translate(30px, 40px) scale(1.08);
+      }
+      100% {
+        transform: translate(-25px, -30px) scale(0.95);
+      }
+    }
+
+    /* Header & Navigation */
+    header {
+      background: rgba(14, 20, 32, 0.65);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      backdrop-filter: blur(24px) saturate(180%);
+      border-bottom: 1px solid var(--glass-border);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2), var(--glass-highlight);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: 0.875rem 2.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      font-weight: 800;
+      font-size: 1.3rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.8));
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px var(--primary-glow), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      transition: transform 0.25s ease;
+    }
+
+    .brand-icon:hover {
+      transform: scale(1.05) rotate(3deg);
+    }
+
+    .brand-text {
+      color: #FFF;
+      font-weight: 800;
+    }
+
+    .brand-text span {
+      background: linear-gradient(135deg, #A5B4FC, #C084FC);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.35rem;
+      background: rgba(255, 255, 255, 0.05);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      padding: 5px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--glass-border);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 0.55rem 1.15rem;
+      border-radius: var(--radius-full);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: inherit;
+    }
+
+    .nav-btn:hover {
+      color: #FFF;
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .nav-btn.active {
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      color: #FFF;
+      box-shadow: 0 4px 18px rgba(99, 102, 241, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(10px);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      backdrop-filter: blur(10px);
+      color: #34D399;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.4rem 0.9rem;
+      border-radius: var(--radius-full);
+      font-family: var(--font-mono);
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 10px #10B981;
+      animation: pulseDot 2s infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.85); }
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      padding: 2.25rem;
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Metric Glass Cards */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.35rem;
+      margin-bottom: 2.25rem;
+    }
+
+    .metric-card {
+      background: var(--bg-glass-card);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 1.6rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      box-shadow: var(--glass-shadow), var(--glass-highlight);
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+    }
+
+    .metric-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--glass-border-light);
+      background: var(--bg-glass-hover);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    }
+
+    .metric-info h4 {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .metric-value {
+      font-size: 2.15rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #FFF;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .metric-sub {
+      font-size: 0.775rem;
+      color: var(--text-dim);
+      margin-top: 0.35rem;
+    }
+
+    .metric-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.55rem;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(12px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Views / Panels */
+    .view-panel {
+      display: none;
+      animation: glassFade 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .view-panel.active {
+      display: block;
+    }
+
+    @keyframes glassFade {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Classic Glass Panel Container */
+    .card-panel {
+      background: var(--bg-glass-card);
+      -webkit-backdrop-filter: blur(24px) saturate(190%);
+      backdrop-filter: blur(24px) saturate(190%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--glass-shadow-lg), var(--glass-highlight);
+      position: relative;
+    }
+
+    .card-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 10%;
+      right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      margin-bottom: 1.75rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .panel-header h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: #FFF;
+    }
+
+    /* Buttons & Controls */
+    .btn {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(129, 140, 248, 0.75));
+      color: #FFF;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      padding: 0.65rem 1.35rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.22s ease;
+      font-family: inherit;
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 16px var(--primary-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--primary-glow), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: var(--glass-border-light);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(248, 113, 113, 0.75));
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      box-shadow: 0 4px 16px var(--danger-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+
+    .btn-danger:hover {
+      background: linear-gradient(135deg, #DC2626, #EF4444);
+      box-shadow: 0 8px 22px var(--danger-glow), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(52, 211, 153, 0.75));
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      box-shadow: 0 4px 16px var(--success-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+
+    .btn-success:hover {
+      background: linear-gradient(135deg, #059669, #10B981);
+      box-shadow: 0 8px 24px var(--success-glow), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    }
+
+    .search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-box input {
+      background: var(--bg-glass-input);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      padding: 0.65rem 1rem 0.65rem 2.6rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      width: 270px;
+      outline: none;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .search-box input:focus {
+      border-color: rgba(129, 140, 248, 0.7);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 0.85rem;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Glass Tables */
+    .table-container {
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--glass-border);
+      background: rgba(10, 15, 26, 0.45);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.06em;
+      padding: 1rem 1.15rem;
+      border-bottom: 1px solid var(--glass-border);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+    }
+
+    td {
+      padding: 1.05rem 1.15rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      color: #E2E8F0;
+      transition: background 0.15s ease;
+    }
+
+    tbody tr:hover td {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .code-badge {
+      font-family: var(--font-mono);
+      background: rgba(99, 102, 241, 0.14);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 0.25rem 0.55rem;
+      border-radius: 6px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #A5B4FC;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    /* Frosted Glass Badges */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.3rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: 0.725rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .tag-present {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34D399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .tag-absent {
+      background: rgba(239, 68, 68, 0.15);
+      color: #F87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .tag-late {
+      background: rgba(245, 158, 11, 0.15);
+      color: #FBBF24;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .tag-eligible {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34D399;
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+
+    .tag-defaulter {
+      background: rgba(239, 68, 68, 0.2);
+      color: #F87171;
+      border: 1px solid rgba(239, 68, 68, 0.45);
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+
+    /* Attendance Toggles with Glass Pill Styling */
+    .att-toggle-group {
+      display: inline-flex;
+      gap: 0.35rem;
+      background: rgba(255, 255, 255, 0.06);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--glass-border);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .att-toggle {
+      border: 1px solid transparent;
+      padding: 0.35rem 0.8rem;
+      border-radius: 7px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--text-muted);
+      background: transparent;
+      transition: all 0.18s ease;
+    }
+
+    .att-toggle:hover {
+      color: #FFF;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .att-toggle.selected-present {
+      background: #10B981;
+      color: #FFF;
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+
+    .att-toggle.selected-absent {
+      background: #EF4444;
+      color: #FFF;
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+
+    .att-toggle.selected-late {
+      background: #F59E0B;
+      color: #FFF;
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+
+    /* Progress bar */
+    .progress-bar-bg {
+      background: rgba(255, 255, 255, 0.08);
+      height: 8px;
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      width: 120px;
+      margin-top: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      transition: width 0.4s ease;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+    }
+
+    /* Modal Glass Form */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(6, 10, 18, 0.75);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 1.25rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      animation: modalFadeIn 0.25s ease;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-card {
+      background: rgba(20, 27, 44, 0.82);
+      -webkit-backdrop-filter: blur(28px) saturate(200%);
+      backdrop-filter: blur(28px) saturate(200%);
+      border: 1px solid var(--glass-border-light);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 530px;
+      padding: 2.25rem;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65), var(--glass-highlight);
+      position: relative;
+    }
+
+    .modal-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 15%;
+      right: 15%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .modal-header h3 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #FFF;
+      letter-spacing: -0.02em;
+    }
+
+    .modal-close {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.15rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.16);
+      color: #FFF;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.15rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      margin-bottom: 1rem;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-group label {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .form-group input, .form-group select {
+      background: var(--bg-glass-input);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      padding: 0.7rem 0.95rem;
+      color: var(--text-main);
+      font-size: 0.875rem;
+      outline: none;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-group select option {
+      background: #111827;
+      color: #F8FAFC;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      border-color: rgba(129, 140, 248, 0.7);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.85rem;
+      margin-top: 1.75rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--glass-border);
+    }
+
+    /* Toast Notification with Glassmorphism */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: rgba(26, 36, 58, 0.85);
+      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(20px);
+      color: #FFF;
+      padding: 0.95rem 1.6rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--glass-border-light);
+      box-shadow: 0 14px 35px rgba(0,0,0,0.5), var(--glass-highlight);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+    }
+
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    #toast.toast-success {
+      border-color: rgba(16, 185, 129, 0.5);
+      background: rgba(6, 78, 59, 0.8);
+      box-shadow: 0 14px 35px rgba(16, 185, 129, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    #toast.toast-error {
+      border-color: rgba(239, 68, 68, 0.5);
+      background: rgba(127, 29, 29, 0.8);
+      box-shadow: 0 14px 35px rgba(239, 68, 68, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    /* Filter Bar */
+    .filter-bar {
+      display: flex;
+      gap: 1.15rem;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding: 1rem 1.25rem;
+      background: rgba(255, 255, 255, 0.03);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .filter-item select, .filter-item input {
+      background: var(--bg-glass-input);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      padding: 0.55rem 0.85rem;
+      color: var(--text-main);
+      font-size: 0.875rem;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .filter-item select option {
+      background: #111827;
+      color: #F8FAFC;
+    }
+
+    .filter-item select:focus, .filter-item input:focus {
+      border-color: rgba(129, 140, 248, 0.7);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.75rem;
+      color: var(--text-muted);
+      font-size: 0.8125rem;
+      border-top: 1px solid var(--glass-border);
+      background: rgba(14, 20, 32, 0.5);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Custom Glass Scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(11, 15, 25, 0.4);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: var(--radius-full);
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.28);
+      background-clip: content-box;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Ambient Glass Mesh & Glowing Orbs -->
+  <div class="glass-mesh" aria-hidden="true">
+    <div class="glass-orb glass-orb-1"></div>
+    <div class="glass-orb glass-orb-2"></div>
+    <div class="glass-orb glass-orb-3"></div>
+    <div class="glass-orb glass-orb-4"></div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+          <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+        </svg>
+      </div>
+      <div class="brand-text">
+        Edu<span>Track</span>
+      </div>
+    </div>
+
+    <nav class="nav-tabs">
+      <button class="nav-btn active" onclick="switchTab('dashboard')" id="tab-dashboard">
+        📊 Dashboard
+      </button>
+      <button class="nav-btn" onclick="switchTab('students')" id="tab-students">
+        👥 Students
+      </button>
+      <button class="nav-btn" onclick="switchTab('mark-attendance')" id="tab-mark">
+        ✍️ Mark Attendance
+      </button>
+      <button class="nav-btn" onclick="switchTab('logs')" id="tab-logs">
+        📅 Attendance Logs
+      </button>
+      <button class="nav-btn" onclick="switchTab('reports')" id="tab-reports">
+        📈 Reports & Defaulters
+      </button>
+      <button class="nav-btn" onclick="switchTab('subjects')" id="tab-subjects">
+        📚 Subjects
+      </button>
+    </nav>
+
+    <div class="status-badge" id="db-status-badge">
+      <span class="status-dot"></span>
+      <span id="db-badge-text">JDBC: Connected</span>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main>
+    <!-- Top Executive Metric KPI Cards -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-info">
+          <h4>Total Students</h4>
+          <div class="metric-value" id="kpi-students">--</div>
+          <div class="metric-sub">Active enrolled records</div>
+        </div>
+        <div class="metric-icon" style="background: rgba(99, 102, 241, 0.15); color: #818CF8;">
+          👥
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-info">
+          <h4>Average Attendance</h4>
+          <div class="metric-value" id="kpi-avg">--%</div>
+          <div class="metric-sub">Across all subjects</div>
+        </div>
+        <div class="metric-icon" style="background: rgba(16, 185, 129, 0.15); color: #34D399;">
+          📈
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-info">
+          <h4>Defaulters Alert</h4>
+          <div class="metric-value" id="kpi-defaulters" style="color: #F87171;">--</div>
+          <div class="metric-sub">&lt; 75% attendance threshold</div>
+        </div>
+        <div class="metric-icon" style="background: rgba(239, 68, 68, 0.15); color: #F87171;">
+          ⚠️
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-info">
+          <h4>Subjects Active</h4>
+          <div class="metric-value" id="kpi-subjects">--</div>
+          <div class="metric-sub">Configured course units</div>
+        </div>
+        <div class="metric-icon" style="background: rgba(245, 158, 11, 0.15); color: #FBBF24;">
+          📚
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 1: DASHBOARD OVERVIEW -->
+    <section class="view-panel active" id="view-dashboard">
+      <div class="card-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Dashboard Overview</h2>
+            <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">
+              Quick actions and low-attendance alerts for immediate faculty action.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.75rem;">
+            <button class="btn btn-secondary" onclick="switchTab('mark-attendance')">
+              ✍️ Take Today's Attendance
+            </button>
+            <button class="btn" onclick="openStudentModal()">
+              ➕ Add Student
+            </button>
+          </div>
+        </div>
+
+        <h3 style="font-size: 1rem; margin-bottom: 1rem; color: #CBD5E1;">⚠️ Critical Defaulters (&lt; 75% Attendance)</h3>
+        <div class="table-container">
+          <table id="dashboard-defaulters-table">
+            <thead>
+              <tr>
+                <th>Roll No</th>
+                <th>Student Name</th>
+                <th>Course</th>
+                <th>Subject</th>
+                <th>Attended / Total</th>
+                <th>Attendance %</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="7" style="text-align:center; color: var(--text-muted);">Loading defaulters list...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: STUDENTS MANAGEMENT -->
+    <section class="view-panel" id="view-students">
+      <div class="card-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Students Directory</h2>
+            <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">
+              Manage complete student profiles, roll numbers, and academic batches.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <div class="search-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input type="text" id="student-search-input" placeholder="Search by Roll No, Name..." onkeyup="filterStudentsTable()">
+            </div>
+            <button class="btn" onclick="openStudentModal()">
+              ➕ Add New Student
+            </button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table id="students-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Roll No</th>
+                <th>Student Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Course / Dept</th>
+                <th>Semester</th>
+                <th>Batch</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="students-table-body">
+              <tr><td colspan="9" style="text-align:center;">Loading students...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: MARK ATTENDANCE -->
+    <section class="view-panel" id="view-mark-attendance">
+      <div class="card-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Class Attendance Roster</h2>
+            <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">
+              Select course and date, then quickly toggle Present, Absent, or Late for each student.
+            </p>
+          </div>
+          <button class="btn btn-success" onclick="submitBatchAttendance()" id="btn-save-attendance">
+            💾 Save Attendance Records
+          </button>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-item">
+            <label for="mark-subject-select">Subject:</label>
+            <select id="mark-subject-select" onchange="loadAttendanceRoster()"></select>
+          </div>
+          <div class="filter-item">
+            <label for="mark-date-input">Date:</label>
+            <input type="date" id="mark-date-input" onchange="loadAttendanceRoster()">
+          </div>
+          <div style="margin-left: auto; display: flex; gap: 0.5rem;">
+            <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;" onclick="setAllAttendance('PRESENT')">Mark All Present</button>
+            <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;" onclick="setAllAttendance('ABSENT')">Mark All Absent</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Roll No</th>
+                <th>Student Name</th>
+                <th>Course</th>
+                <th>Current Status</th>
+                <th style="text-align: right;">Quick Toggle Status</th>
+              </tr>
+            </thead>
+            <tbody id="roster-table-body">
+              <tr><td colspan="5" style="text-align:center;">Loading class roster...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: ATTENDANCE LOGS -->
+    <section class="view-panel" id="view-logs">
+      <div class="card-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Attendance Daily Records</h2>
+            <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">
+              Inspect saved attendance sheets by specific date and subject code.
+            </p>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-item">
+            <label for="logs-subject-select">Subject:</label>
+            <select id="logs-subject-select" onchange="loadAttendanceLogs()"></select>
+          </div>
+          <div class="filter-item">
+            <label for="logs-date-input">Date:</label>
+            <input type="date" id="logs-date-input" onchange="loadAttendanceLogs()">
+          </div>
+          <button class="btn btn-secondary" onclick="loadAttendanceLogs()">Search Records</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Roll No</th>
+                <th>Student Name</th>
+                <th>Subject</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody id="logs-table-body">
+              <tr><td colspan="7" style="text-align:center;">Select filter and load records...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: REPORTS & DEFAULTERS -->
+    <section class="view-panel" id="view-reports">
+      <div class="card-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Defaulter & Eligibility Analytics</h2>
+            <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">
+              Comprehensive breakdown of total classes, percentage, and exam eligibility.
+            </p>
+          </div>
+          <div class="filter-item">
+            <label for="reports-threshold">Threshold (%):</label>
+            <input type="number" id="reports-threshold" value="75" min="1" max="100" style="width: 70px;" onchange="loadReports()">
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-item">
+            <label for="reports-subject-select">Filter by Subject:</label>
+            <select id="reports-subject-select" onchange="loadReports()">
+              <option value="ALL">All Subjects Combined</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Roll No</th>
+                <th>Student Name</th>
+                <th>Course</th>
+                <th>Total Classes</th>
+                <th>Present</th>
+                <th>Absent</th>
+                <th>Late</th>
+                <th>Percentage</th>
+                <th>Exam Status</th>
+              </tr>
+            </thead>
+            <tbody id="reports-table-body">
+              <tr><td colspan="9" style="text-align:center;">Loading analytics report...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 6: SUBJECTS -->
+    <section class="view-panel" id="view-subjects">
+      <div class="card-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Subjects & Courses</h2>
+            <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">
+              Manage the curriculum subjects and course instructors.
+            </p>
+          </div>
+          <button class="btn" onclick="openSubjectModal()">
+            ➕ Add Subject
+          </button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Subject Code</th>
+                <th>Subject Name</th>
+                <th>Instructor / Faculty</th>
+              </tr>
+            </thead>
+            <tbody id="subjects-table-body">
+              <tr><td colspan="4" style="text-align:center;">Loading subjects...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ADD STUDENT MODAL -->
+  <div class="modal-overlay" id="modal-student">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Add New Student</h3>
+        <button class="modal-close" onclick="closeStudentModal()">✕</button>
+      </div>
+      <form id="student-form" onsubmit="handleCreateStudent(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="stu-roll">Roll Number *</label>
+            <input type="text" id="stu-roll" required placeholder="e.g. CS202406">
+          </div>
+          <div class="form-group">
+            <label for="stu-name">Full Name *</label>
+            <input type="text" id="stu-name" required placeholder="e.g. Rahul Sharma">
+          </div>
+          <div class="form-group">
+            <label for="stu-email">Email Address</label>
+            <input type="email" id="stu-email" placeholder="rahul@college.edu">
+          </div>
+          <div class="form-group">
+            <label for="stu-phone">Phone Number</label>
+            <input type="text" id="stu-phone" placeholder="9876543210">
+          </div>
+          <div class="form-group">
+            <label for="stu-course">Course / Department *</label>
+            <input type="text" id="stu-course" required placeholder="B.Tech CSE">
+          </div>
+          <div class="form-group">
+            <label for="stu-sem">Semester</label>
+            <input type="text" id="stu-sem" placeholder="Semester 4">
+          </div>
+          <div class="form-group full">
+            <label for="stu-batch">Batch / Academic Year</label>
+            <input type="text" id="stu-batch" placeholder="2024-2028">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeStudentModal()">Cancel</button>
+          <button type="submit" class="btn">Save Student</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADD SUBJECT MODAL -->
+  <div class="modal-overlay" id="modal-subject">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Add New Subject</h3>
+        <button class="modal-close" onclick="closeSubjectModal()">✕</button>
+      </div>
+      <form id="subject-form" onsubmit="handleCreateSubject(event)">
+        <div class="form-group">
+          <label for="subj-code">Subject Code *</label>
+          <input type="text" id="subj-code" required placeholder="e.g. CS105">
+        </div>
+        <div class="form-group">
+          <label for="subj-name">Subject Name *</label>
+          <input type="text" id="subj-name" required placeholder="e.g. Cloud Computing">
+        </div>
+        <div class="form-group">
+          <label for="subj-instructor">Instructor Name</label>
+          <input type="text" id="subj-instructor" placeholder="e.g. Dr. Rajesh Kumar">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeSubjectModal()">Cancel</button>
+          <button type="submit" class="btn">Save Subject</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast"></div>
+
+  <!-- Footer -->
+  <footer>
+    Student Attendance Management System &bull; Pure Java &amp; JDBC &bull; Powered by Java SE HttpServer
+  </footer>
+
+  <!-- Core JavaScript -->
+  <script>
+    let globalStudents = [];
+    let globalSubjects = [];
+    let rosterStatusMap = {}; // studentId -> 'PRESENT' | 'ABSENT' | 'LATE'
+
+    // Init on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('mark-date-input').value = today;
+      document.getElementById('logs-date-input').value = today;
+
+      loadStats();
+      loadSubjects();
+      loadStudents();
+      loadReports();
+    });
+
+    // Navigation Tab Switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.view-panel').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+
+      const targetView = document.getElementById('view-' + tabId);
+      if (targetView) targetView.classList.add('active');
+
+      const targetBtn = document.getElementById('tab-' + tabId);
+      if (targetBtn) targetBtn.classList.add('active');
+
+      if (tabId === 'dashboard') {
+        loadStats();
+        loadReports();
+      } else if (tabId === 'mark-attendance') {
+        loadAttendanceRoster();
+      } else if (tabId === 'logs') {
+        loadAttendanceLogs();
+      } else if (tabId === 'reports') {
+        loadReports();
+      }
+    }
+
+    // Toast
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.className = 'show ' + (type === 'error' ? 'toast-error' : 'toast-success');
+      setTimeout(() => {
+        toast.className = '';
+      }, 3500);
+    }
+
+    // Load Stats KPI
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/stats');
+        const data = await res.json();
+        document.getElementById('kpi-students').textContent = data.totalStudents;
+        document.getElementById('kpi-avg').textContent = data.averageAttendance + '%';
+        document.getElementById('kpi-defaulters').textContent = data.defaultersCount;
+        document.getElementById('kpi-subjects').textContent = data.totalSubjects;
+        document.getElementById('db-badge-text').textContent = 'JDBC: ' + data.dbType.toUpperCase();
+      } catch (err) {
+        console.error('Stats error:', err);
+      }
+    }
+
+    // Load Students
+    async function loadStudents() {
+      try {
+        const res = await fetch('/api/students');
+        globalStudents = await res.json();
+        renderStudentsTable(globalStudents);
+      } catch (err) {
+        console.error('Load students error:', err);
+      }
+    }
+
+    function renderStudentsTable(students) {
+      const tbody = document.getElementById('students-table-body');
+      if (!students || students.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color: var(--text-muted);">No student records found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = students.map(s => `
+        <tr>
+          <td><span class="code-badge">#${s.id}</span></td>
+          <td><strong style="color: #A5B4FC;">${escapeHtml(s.rollNo)}</strong></td>
+          <td>${escapeHtml(s.name)}</td>
+          <td style="color: var(--text-muted);">${escapeHtml(s.email || '-')}</td>
+          <td style="color: var(--text-muted);">${escapeHtml(s.phone || '-')}</td>
+          <td>${escapeHtml(s.course)}</td>
+          <td>${escapeHtml(s.semester || '-')}</td>
+          <td>${escapeHtml(s.batch || '-')}</td>
+          <td>
+            <button class="btn btn-danger" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="deleteStudent('${s.rollNo}', '${s.name}')">
+              Delete
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterStudentsTable() {
+      const q = document.getElementById('student-search-input').value.toLowerCase().trim();
+      if (!q) {
+        renderStudentsTable(globalStudents);
+        return;
+      }
+      const filtered = globalStudents.filter(s => 
+        (s.rollNo && s.rollNo.toLowerCase().includes(q)) ||
+        (s.name && s.name.toLowerCase().includes(q)) ||
+        (s.course && s.course.toLowerCase().includes(q))
+      );
+      renderStudentsTable(filtered);
+    }
+
+    // Delete Student
+    async function deleteStudent(rollNo, name) {
+      if (!confirm(`Are you sure you want to delete student "${name}" (${rollNo})? All attendance records will be removed.`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/students?rollNo=${encodeURIComponent(rollNo)}`, {
+          method: 'DELETE'
+        });
+        const result = await res.json();
+        if (res.ok) {
+          showToast(`Student ${name} deleted successfully!`);
+          loadStudents();
+          loadStats();
+          loadReports();
+        } else {
+          showToast(result.error || 'Failed to delete student', 'error');
+        }
+      } catch (err) {
+        showToast('Error deleting student: ' + err.message, 'error');
+      }
+    }
+
+    // Load Subjects
+    async function loadSubjects() {
+      try {
+        const res = await fetch('/api/subjects');
+        globalSubjects = await res.json();
+
+        // Render subjects table
+        const tbody = document.getElementById('subjects-table-body');
+        if (globalSubjects.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No subjects found.</td></tr>';
+        } else {
+          tbody.innerHTML = globalSubjects.map(s => `
+            <tr>
+              <td><span class="code-badge">#${s.id}</span></td>
+              <td><strong style="color: #818CF8;">${escapeHtml(s.code)}</strong></td>
+              <td>${escapeHtml(s.name)}</td>
+              <td>${escapeHtml(s.instructor || 'Unassigned')}</td>
+            </tr>
+          `).join('');
+        }
+
+        // Update dropdown selects
+        const markSelect = document.getElementById('mark-subject-select');
+        const logsSelect = document.getElementById('logs-subject-select');
+        const reportsSelect = document.getElementById('reports-subject-select');
+
+        const options = globalSubjects.map(s => `<option value="${s.code}">${s.code} - ${s.name}</option>`).join('');
+        markSelect.innerHTML = options;
+        logsSelect.innerHTML = options;
+        reportsSelect.innerHTML = '<option value="ALL">All Subjects Combined</option>' + options;
+
+        loadAttendanceRoster();
+      } catch (err) {
+        console.error('Load subjects error:', err);
+      }
+    }
+
+    // Load Roster for Marking Attendance
+    async function loadAttendanceRoster() {
+      const subject = document.getElementById('mark-subject-select').value;
+      const date = document.getElementById('mark-date-input').value;
+      if (!subject || !date) return;
+
+      const tbody = document.getElementById('roster-table-body');
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading roster...</td></tr>';
+
+      try {
+        // Fetch existing attendance logs for this subject & date to pre-fill
+        const res = await fetch(`/api/attendance?subject=${encodeURIComponent(subject)}&date=${encodeURIComponent(date)}`);
+        const existingLogs = await res.json();
+        const existingMap = {};
+        existingLogs.forEach(l => { existingMap[l.studentId] = l.status; });
+
+        rosterStatusMap = {};
+        tbody.innerHTML = globalStudents.map(s => {
+          const currentStatus = existingMap[s.id] || 'PRESENT';
+          rosterStatusMap[s.id] = currentStatus;
+
+          return `
+            <tr id="roster-row-${s.id}">
+              <td><strong style="color: #A5B4FC;">${escapeHtml(s.rollNo)}</strong></td>
+              <td>${escapeHtml(s.name)}</td>
+              <td>${escapeHtml(s.course)}</td>
+              <td>
+                <span id="badge-status-${s.id}" class="tag ${getStatusTagClass(currentStatus)}">
+                  ${currentStatus}
+                </span>
+              </td>
+              <td style="text-align: right;">
+                <div class="att-toggle-group">
+                  <button type="button" class="att-toggle ${currentStatus === 'PRESENT' ? 'selected-present' : ''}" 
+                    id="btn-p-${s.id}" onclick="setRosterStatus(${s.id}, 'PRESENT')">P</button>
+                  <button type="button" class="att-toggle ${currentStatus === 'ABSENT' ? 'selected-absent' : ''}" 
+                    id="btn-a-${s.id}" onclick="setRosterStatus(${s.id}, 'ABSENT')">A</button>
+                  <button type="button" class="att-toggle ${currentStatus === 'LATE' ? 'selected-late' : ''}" 
+                    id="btn-l-${s.id}" onclick="setRosterStatus(${s.id}, 'LATE')">L</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--danger);">Failed to load roster.</td></tr>';
+      }
+    }
+
+    function setRosterStatus(studentId, status) {
+      rosterStatusMap[studentId] = status;
+      const badge = document.getElementById('badge-status-' + studentId);
+      if (badge) {
+        badge.className = 'tag ' + getStatusTagClass(status);
+        badge.textContent = status;
+      }
+
+      ['p', 'a', 'l'].forEach(type => {
+        const btn = document.getElementById(`btn-${type}-${studentId}`);
+        if (btn) btn.className = 'att-toggle';
+      });
+
+      const selectedBtn = document.getElementById(`btn-${status[0].toLowerCase()}-${studentId}`);
+      if (selectedBtn) {
+        selectedBtn.classList.add('selected-' + status.toLowerCase());
+      }
+    }
+
+    function setAllAttendance(status) {
+      globalStudents.forEach(s => {
+        setRosterStatus(s.id, status);
+      });
+    }
+
+    function getStatusTagClass(status) {
+      switch (status) {
+        case 'PRESENT': return 'tag-present';
+        case 'ABSENT': return 'tag-absent';
+        default: return 'tag-late';
+      }
+    }
+
+    // Submit Batch Attendance
+    async function submitBatchAttendance() {
+      const subjectCode = document.getElementById('mark-subject-select').value;
+      const date = document.getElementById('mark-date-input').value;
+      if (!subjectCode || !date) {
+        showToast('Please select subject and date', 'error');
+        return;
+      }
+
+      // Format entries: "id:STATUS;id:STATUS"
+      const entries = Object.keys(rosterStatusMap).map(sId => `${sId}:${rosterStatusMap[sId]}`).join(';');
+
+      try {
+        const btn = document.getElementById('btn-save-attendance');
+        btn.textContent = 'Saving...';
+        btn.disabled = true;
+
+        const bodyData = new URLSearchParams();
+        bodyData.append('subjectCode', subjectCode);
+        bodyData.append('date', date);
+        bodyData.append('entries', entries);
+
+        const res = await fetch('/api/attendance', {
+          method: 'POST',
+          body: bodyData
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          showToast(`Attendance recorded successfully for ${data.marked || Object.keys(rosterStatusMap).length} students!`);
+          loadStats();
+          loadReports();
+        } else {
+          showToast(data.error || 'Failed to record attendance', 'error');
+        }
+      } catch (err) {
+        showToast('Error recording attendance: ' + err.message, 'error');
+      } finally {
+        const btn = document.getElementById('btn-save-attendance');
+        btn.textContent = '💾 Save Attendance Records';
+        btn.disabled = false;
+      }
+    }
+
+    // Load Attendance Logs
+    async function loadAttendanceLogs() {
+      const subject = document.getElementById('logs-subject-select').value;
+      const date = document.getElementById('logs-date-input').value;
+      const tbody = document.getElementById('logs-table-body');
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Loading records...</td></tr>';
+
+      try {
+        const res = await fetch(`/api/attendance?subject=${encodeURIComponent(subject)}&date=${encodeURIComponent(date)}`);
+        const records = await res.json();
+
+        if (records.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-muted);">No attendance records found for ${escapeHtml(subject)} on ${escapeHtml(date)}.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = records.map((r, i) => `
+          <tr>
+            <td>${i + 1}</td>
+            <td><strong style="color: #A5B4FC;">${escapeHtml(r.rollNo)}</strong></td>
+            <td>${escapeHtml(r.name)}</td>
+            <td><span class="code-badge">${escapeHtml(r.subjectCode)}</span></td>
+            <td>${escapeHtml(r.date)}</td>
+            <td><span class="tag ${getStatusTagClass(r.status)}">${escapeHtml(r.status)}</span></td>
+            <td style="color: var(--text-muted);">${escapeHtml(r.remarks || '-')}</td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--danger);">Failed to load logs.</td></tr>';
+      }
+    }
+
+    // Load Reports & Defaulters
+    async function loadReports() {
+      const subject = document.getElementById('reports-subject-select').value || 'ALL';
+      const threshold = parseFloat(document.getElementById('reports-threshold').value) || 75.0;
+
+      try {
+        const res = await fetch(`/api/reports?subject=${encodeURIComponent(subject)}`);
+        const reports = await res.json();
+
+        // 1. Render main reports table
+        const tbody = document.getElementById('reports-table-body');
+        if (reports.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color: var(--text-muted);">No attendance data available yet.</td></tr>';
+        } else {
+          tbody.innerHTML = reports.map(r => {
+            const pct = r.percentage;
+            const isDefaulter = r.totalClasses > 0 && pct < threshold;
+            const barColor = pct >= threshold ? '#10B981' : (pct >= 50 ? '#F59E0B' : '#EF4444');
+
+            return `
+              <tr>
+                <td><strong style="color: #A5B4FC;">${escapeHtml(r.rollNo)}</strong></td>
+                <td>${escapeHtml(r.name)}</td>
+                <td>${escapeHtml(r.course)}</td>
+                <td><strong>${r.totalClasses}</strong></td>
+                <td style="color: #34D399;">${r.presentCount}</td>
+                <td style="color: #F87171;">${r.absentCount}</td>
+                <td style="color: #FBBF24;">${r.lateCount}</td>
+                <td>
+                  <strong>${pct.toFixed(1)}%</strong>
+                  <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: ${Math.min(100, pct)}%; background-color: ${barColor};"></div>
+                  </div>
+                </td>
+                <td>
+                  <span class="tag ${isDefaulter ? 'tag-defaulter' : 'tag-eligible'}">
+                    ${isDefaulter ? 'DEFAULTER' : 'ELIGIBLE'}
+                  </span>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+
+        // 2. Render Critical Defaulters on Dashboard tab
+        const dashDefaulters = reports.filter(r => r.totalClasses > 0 && r.percentage < threshold);
+        const dashTbody = document.querySelector('#dashboard-defaulters-table tbody');
+        if (dashDefaulters.length === 0) {
+          dashTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color: #34D399; font-weight: 600;">✨ All students are currently above the 75% attendance threshold!</td></tr>';
+        } else {
+          dashTbody.innerHTML = dashDefaulters.map(r => `
+            <tr>
+              <td><strong style="color: #A5B4FC;">${escapeHtml(r.rollNo)}</strong></td>
+              <td>${escapeHtml(r.name)}</td>
+              <td>${escapeHtml(r.course)}</td>
+              <td>${escapeHtml(r.subjectCode)}</td>
+              <td>${r.presentCount + r.lateCount} / ${r.totalClasses}</td>
+              <td style="color: #F87171; font-weight: 700;">${r.percentage.toFixed(1)}%</td>
+              <td><span class="tag tag-defaulter">SHORTAGE (&lt; 75%)</span></td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        console.error('Reports error:', err);
+      }
+    }
+
+    // Student Modal Handlers
+    function openStudentModal() {
+      document.getElementById('modal-student').classList.add('active');
+    }
+    function closeStudentModal() {
+      document.getElementById('modal-student').classList.remove('active');
+      document.getElementById('student-form').reset();
+    }
+    async function handleCreateStudent(e) {
+      e.preventDefault();
+      const body = new URLSearchParams({
+        rollNo: document.getElementById('stu-roll').value.trim(),
+        name: document.getElementById('stu-name').value.trim(),
+        email: document.getElementById('stu-email').value.trim(),
+        phone: document.getElementById('stu-phone').value.trim(),
+        course: document.getElementById('stu-course').value.trim(),
+        semester: document.getElementById('stu-sem').value.trim(),
+        batch: document.getElementById('stu-batch').value.trim()
+      });
+
+      try {
+        const res = await fetch('/api/students', { method: 'POST', body });
+        const result = await res.json();
+        if (res.ok) {
+          showToast('Student registered successfully!');
+          closeStudentModal();
+          loadStudents();
+          loadStats();
+          loadAttendanceRoster();
+        } else {
+          showToast(result.error || 'Failed to add student', 'error');
+        }
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+    }
+
+    // Subject Modal Handlers
+    function openSubjectModal() {
+      document.getElementById('modal-subject').classList.add('active');
+    }
+    function closeSubjectModal() {
+      document.getElementById('modal-subject').classList.remove('active');
+      document.getElementById('subject-form').reset();
+    }
+    async function handleCreateSubject(e) {
+      e.preventDefault();
+      const body = new URLSearchParams({
+        code: document.getElementById('subj-code').value.trim(),
+        name: document.getElementById('subj-name').value.trim(),
+        instructor: document.getElementById('subj-instructor').value.trim()
+      });
+
+      try {
+        const res = await fetch('/api/subjects', { method: 'POST', body });
+        const result = await res.json();
+        if (res.ok) {
+          showToast('Subject created successfully!');
+          closeSubjectModal();
+          loadSubjects();
+          loadStats();
+        } else {
+          showToast(result.error || 'Failed to create subject', 'error');
+        }
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
